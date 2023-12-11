@@ -27,3 +27,5 @@ def single_view(request, pid):
 
 
     
+def test(request):
+    return render(request, 'test.html')
