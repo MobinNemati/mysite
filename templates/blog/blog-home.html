@@ -99,7 +99,7 @@
 					<div class="col-lg-3  col-md-3 meta-details">
 						<ul class="tags">
 							{% for cat in post.category.all %}
-							{{ cat.name }} {% if not forloop.last %},{% endif %}
+							<li><a href="{% url 'blog:category' cat_name=cat.name %}">{{ cat.name }}</a> {% if not forloop.last %},{% endif %}</li>
 							{% endfor %}
 						</ul>
 						<div class="user-details row">

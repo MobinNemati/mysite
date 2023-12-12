@@ -12,7 +12,7 @@ def blog_view(request):
     return render(request, 'blog/blog-home.html', context)
 
 
-def single_view(request, pid):
+def blog_single(request, pid):
     now=timezone.now()
     posts = get_object_or_404(Post, published_date__lt=now, status=1, id=pid)
     posts.counted_view += 1
@@ -25,6 +25,11 @@ def single_view(request, pid):
     return render(request, 'blog/blog-single.html', context)
         
 
+def blog_category(request, cat_name):
+    posts = Post.objects.filter(status=1)
+    posts = posts.filter(category__name=cat_name)
+    context = {'posts':posts}
+    return render(request, 'blog/blog-home.html', context)
 
     
 def test(request):
