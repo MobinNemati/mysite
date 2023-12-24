@@ -1,7 +1,8 @@
 asgiref==3.7.2
+bootstrap4==0.1.0
 Django==3.2
+Pillow==10.1.0
 pytz==2023.3.post1
 setuptools==68.2.2
 sqlparse==0.4.4
 tzdata==2023.3
-pillow==10.1.0

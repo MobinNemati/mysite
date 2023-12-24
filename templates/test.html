@@ -9,7 +9,11 @@
     <title>title</title>
 </head>
 <body>
-    <p>test    :</p>
-    {% popalur %}
+    <form action="{% url 'blog:test' %}" method="post">
+        {% csrf_token %}
+
+        {{form.as_p}}
+        <button type="submit">submit</button>
+    </form>
 </body>
 </html>

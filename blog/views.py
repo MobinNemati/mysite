@@ -3,11 +3,26 @@ from .models import Post
 import datetime, time
 from django.utils import timezone
 from django.db.models import F
+from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
+from website.forms import ContactForm
 
 
-def blog_view(request):
+def blog_view(request, cat_name=None, author_username=None):
     now1=timezone.now()
     posts = Post.objects.filter(published_date__lt=now1, status=1)
+    if cat_name:
+        posts = posts.filter(category__name=cat_name)
+    if author_username:
+        posts = posts.filter(author__username=author_username)
+
+    posts = Paginator(posts, 3)
+    try:
+        page_number = request.GET.get('page')
+        posts = posts.get_page(page_number)
+    except PageNotAnInteger:
+        posts = posts.get_page(1)
+    except EmptyPage:
+        posts = posts.get_page(1)
     context = {'posts': posts}
     return render(request, 'blog/blog-home.html', context)
 
@@ -23,14 +38,25 @@ def blog_single(request, pid):
 
     context = {'posts': posts, 'prev_post': prev_post, 'next_post': next_post}
     return render(request, 'blog/blog-single.html', context)
-        
-
-def blog_category(request, cat_name):
-    posts = Post.objects.filter(status=1)
-    posts = posts.filter(category__name=cat_name)
-    context = {'posts':posts}
-    return render(request, 'blog/blog-home.html', context)
 
     
+def blog_search(request):
+    posts = Post.objects.filter(status=1)
+    if request.method == 'GET':
+        if s := request.GET.get('s'):
+            posts = posts.filter(content__contains=s)
+    context = {'posts': posts}
+    return render(request, 'blog/blog-home.html', context)    
+
+
 def test(request):
-    return render(request, 'test.html')
+    if request.method == 'POST':
+        form = ContactForm(request.POST)
+        if form.is_valid():
+            form.save()
+            return HttpResponse('ok')
+        else:
+            return HttpResponse('not valid')
+
+    form = ContactForm()
+    return render(request, 'test.html', {'form':form})
