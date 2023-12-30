@@ -1,10 +1,13 @@
 from django.shortcuts import render, HttpResponse, get_object_or_404
-from .models import Post
+from .models import Post, Comment
 import datetime, time
 from django.utils import timezone
 from django.db.models import F
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 from website.forms import ContactForm
+from blog.forms import CommentForm
+from django.contrib import messages
+
 
 
 def blog_view(request, cat_name=None, author_username=None, tag_name=None):
@@ -30,15 +33,24 @@ def blog_view(request, cat_name=None, author_username=None, tag_name=None):
 
 
 def blog_single(request, pid):
+    if request.method == 'POST':
+        form = CommentForm(request.POST)
+        if form.is_valid():
+            form.save()
+            messages.success(request, 'your commnet submitted successfully')
+        else:
+            messages.error(request, 'your commnet didnt submited')
+
     now=timezone.now()
     posts = get_object_or_404(Post, published_date__lt=now, status=1, id=pid)
     posts.counted_view += 1
     posts.save()
+    comments = Comment.objects.filter(post=posts.id, approved=True)
 
     next_post = Post.objects.filter(published_date__lt=now, status=1, id__gt=pid).order_by('id').first()
     prev_post = Post.objects.filter(published_date__lt=now, status=1, id__lt=pid).order_by('-id').first()
-
-    context = {'posts': posts, 'prev_post': prev_post, 'next_post': next_post}
+    form = CommentForm()
+    context = {'posts': posts, 'prev_post': prev_post, 'next_post': next_post, 'comments': comments, 'form':form}
     return render(request, 'blog/blog-single.html', context)
 
     
