@@ -71,7 +71,7 @@ SUMMERNOTE_CONFIG = {
         'airMode': False,
 
         # Change editor size
-        'width': '900px',
+        'width': '700px',
         'height': '480',
 
         # Toolbar customization
