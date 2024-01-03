@@ -4,8 +4,6 @@ from django.urls import reverse
 from taggit.managers import TaggableManager
 
 
-
-
 class Category(models.Model):
     name = models.CharField(max_length=255)
 
