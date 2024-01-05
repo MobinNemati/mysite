@@ -1,4 +1,4 @@
-from django.shortcuts import render, HttpResponse, get_object_or_404
+from django.shortcuts import render, HttpResponse, get_object_or_404, HttpResponseRedirect
 from .models import Post, Comment
 import datetime, time
 from django.utils import timezone
@@ -7,6 +7,7 @@ from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 from website.forms import ContactForm
 from blog.forms import CommentForm
 from django.contrib import messages
+from django.urls import reverse
 
 
 
@@ -45,13 +46,27 @@ def blog_single(request, pid):
     posts = get_object_or_404(Post, published_date__lt=now, status=1, id=pid)
     posts.counted_view += 1
     posts.save()
-    comments = Comment.objects.filter(post=posts.id, approved=True)
+    
+    if not posts.login_require:
+        comments = Comment.objects.filter(post=posts.id, approved=True)
 
-    next_post = Post.objects.filter(published_date__lt=now, status=1, id__gt=pid).order_by('id').first()
-    prev_post = Post.objects.filter(published_date__lt=now, status=1, id__lt=pid).order_by('-id').first()
-    form = CommentForm()
-    context = {'posts': posts, 'prev_post': prev_post, 'next_post': next_post, 'comments': comments, 'form':form}
-    return render(request, 'blog/blog-single.html', context)
+        next_post = Post.objects.filter(published_date__lt=now, status=1, id__gt=pid).order_by('id').first()
+        prev_post = Post.objects.filter(published_date__lt=now, status=1, id__lt=pid).order_by('-id').first()
+        form = CommentForm()
+        context = {'posts': posts, 'prev_post': prev_post, 'next_post': next_post, 'comments': comments, 'form':form}
+        return render(request, 'blog/blog-single.html', context)
+    
+    if posts.login_require is not None:
+        if request.user.is_authenticated:
+            comments = Comment.objects.filter(post=posts.id, approved=True)
+            
+            next_post = Post.objects.filter(published_date__lt=now, status=1, id__gt=pid).order_by('id').first()
+            prev_post = Post.objects.filter(published_date__lt=now, status=1, id__lt=pid).order_by('-id').first()
+            form = CommentForm()
+            context = {'posts': posts, 'prev_post': prev_post, 'next_post': next_post, 'comments': comments, 'form':form}
+            return render(request, 'blog/blog-single.html', context) 
+        else:
+            return HttpResponseRedirect(reverse('accounts:login'))   
 
     
 def blog_search(request):
