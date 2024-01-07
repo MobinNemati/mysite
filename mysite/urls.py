@@ -6,7 +6,9 @@ from django.conf.urls.static import static
 from django.contrib.sitemaps.views import sitemap
 from website.sitemaps import StaticViewSitemap
 from blog.sitemaps import BlogSitemap
-from django.contrib.auth.urls
+from django.contrib.auth import views as auth_views
+
+
 
 sitemaps = {
     "static": StaticViewSitemap,
