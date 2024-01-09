@@ -7,28 +7,29 @@ from django.contrib.auth.decorators import login_required
 from django.contrib.auth import views as auth_views
 from django.urls import reverse_lazy
 from django.contrib.sites.models import Site
+from .forms import SignupForm
 
 
 
 def login_view(request):
     if not request.user.is_authenticated:
         if request.method == 'POST':
-            username = request.POST.get('username')
-            email = request.POST.get('email')
+            username_or_email = request.POST.get('username')
             password = request.POST.get('password')
-            
-            if username:
-                user = authenticate(request, username=username, password=password)
-            if email:
-                try:
-                    user = User.objects.get(email=email)
-                except User.DoesNotExist:
-                    user = None
-            
+
+            try:
+                user = User.objects.get(email=username_or_email)
+            except User.DoesNotExist:
+                user = None
+
+            if user is not None:
+                user = authenticate(request, username=user.username, password=password)
+            else:
+                user = authenticate(request, username=username_or_email, password=password)
+
             if user is not None:
                 login(request, user)
                 return redirect('/')
-
             else:
                 messages.error(request, 'Invalid username or password')
         return render(request, 'accounts/login.html')
@@ -45,15 +46,22 @@ def logout_view(request):
 def signup_view(request):
     if not request.user.is_authenticated:
         if request.method == 'POST':
-            form = UserCreationForm(request.POST)
-            if form.is_valid():
-                form.save()
-                return redirect('/')
+            username = request.POST.get('username')
+            email = request.POST.get('email')
+            password = request.POST.get('password')
+            confirm_password = request.POST.get('password2')
+
+            if password != confirm_password:
+                messages.error(request, 'Password and Confirm Password do not match.')
+            
             else:
-                messages.error(request, 'try again')
-        form = UserCreationForm()
-        context = {'form': form}
-        return render(request, 'accounts/signup.html', context)
+                if User.objects.filter(email=email).exists():
+                    messages.error(request, 'Email already exists.')
+                else:
+                    user = User.objects.create_user(username=username, email=email, password=password)
+                    return redirect('/')
+
+        return render(request, 'accounts/signup.html')
     else:
         return redirect('/')
     
