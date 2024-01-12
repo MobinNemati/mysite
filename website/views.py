@@ -37,3 +37,6 @@ def newsletter_view(request):
             messages.error(request, 'your newsletter didnt submited')
             return HttpResponseRedirect('/')
 
+
+def coming_soon(request):
+    return render(request, 'website/coming_soon.html')
