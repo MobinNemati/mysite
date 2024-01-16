@@ -38,6 +38,7 @@ INSTALLED_APPS = [
     'bootstrap4',
     'taggit',
     'crispy_forms',
+    'compressor',
     'website',
     'blog',
     'accounts',
@@ -50,7 +51,6 @@ ROBOTS_USE_HOST = True
 ROBOTS_USE_SITEMAP = True
 
 # summernote
-X_FRAME_OPTIONS = 'SAMEORIGIN'
 SUMMERNOTE_THEME = 'bs4'
 SUMMERNOTE_CONFIG = {
     # Using SummernoteWidget - iframe mode, default
@@ -85,6 +85,11 @@ MULTI_CAPTCHA_ADMIN = {
 }
 
 MIDDLEWARE = [
+    #compressor settings
+    'django.middleware.gzip.GZipMiddleware',
+    'htmlmin.middleware.HtmlMinifyMiddleware',
+    'htmlmin.middleware.MarkRequestMiddleware',
+
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
@@ -173,3 +178,26 @@ EMAIL_USE_TLS = True
 EMAIL_HOST_PASSWORD = 'mngz wvkt spdd qvat'
 
 
+
+
+#compressor settings
+STATICFILES_FINDERS = (
+    'django.contrib.staticfiles.finders.FileSystemFinder',
+    'django.contrib.staticfiles.finders.AppDirectoriesFinder',
+    'compressor.finders.CompressorFinder',
+)
+
+
+COMPRESS_ENABLED = True
+COMPRESS_CSS_HASHING_METHOD = 'content'
+COMPRESS_FILTERS = {
+    'css':[
+        'compressor.filters.css_default.CssAbsoluteFilter',
+        'compressor.filters.cssmin.rCSSMinFilter',
+    ],
+    'js':[
+        'compressor.filters.jsmin.JSMinFilter',
+    ]
+}
+HTML_MINIFY = True
+KEEP_COMMENTS_ON_MINIFYING = True

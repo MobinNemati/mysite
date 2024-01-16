@@ -20,7 +20,8 @@ sitemaps = {
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('captcha/', include('captcha.urls')),
-    re_path('', coming_soon),
+    #re_path('', coming_soon),
+
     
     path('', include('website.urls')),
     path('blog/', include('blog.urls')),

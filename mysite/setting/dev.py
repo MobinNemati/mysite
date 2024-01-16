@@ -17,7 +17,7 @@ ALLOWED_HOSTS = []
 
 
 # sites framework
-SITE_ID = 2
+SITE_ID = 4
 
 
 # Database
@@ -42,3 +42,10 @@ STATICFILES_DIRS = [
 INTERNAL_IPS = [
     "127.0.0.1",
 ]
+
+X_FRAME_OPTIONS = 'SAMEORIGIN'
+
+
+#compressor settings
+COMPRESS_ENABLED = True
+
